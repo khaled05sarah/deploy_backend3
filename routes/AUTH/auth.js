@@ -347,6 +347,11 @@ router.post('/login', async(req, res) => {
 });
 
 
+const uploadFields = upload.fields([
+    { name: 'profilePhoto', maxCount: 1 },
+    { name: 'commerceRegister', maxCount: 1 },
+    { name: 'carteidentite', maxCount: 1 }
+]);
 
 router.post('/upgrade', uploadFields, async (req, res) => {
     console.log("📩 Body reçu :", req.body);
