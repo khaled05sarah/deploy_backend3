@@ -348,41 +348,6 @@ router.post('/login', async(req, res) => {
 
 
 // 🔹 Route pour supprimer un utilisateur avec confirmation du mot de passe
-router.delete('/delete-account', async(req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.status(400).json({ message: "Email et mot de passe requis." });
-        }
-
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(404).json({ message: "Utilisateur non trouvé." });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Mot de passe incorrect." });
-        }
-
-        await Mechanic.deleteOne({ userId: user._id });
-        await Towing.deleteOne({ userId: user._id });
-        await Vendor.deleteOne({ userId: user._id });
-        await User.deleteOne({ _id: user._id });
-
-        res.json({ message: "Compte supprimé avec succès." });
-
-    } catch (error) {
-        console.error("❌ Erreur lors de la suppression du compte :", error);
-        res.status(500).json({ message: "Erreur serveur." });
-    }
-});
-const uploadFields = upload.fields([
-    { name: 'profilePhoto', maxCount: 1 },
-    { name: 'commerceRegister', maxCount: 1 },
-    { name: 'carteidentite', maxCount: 1 }
-]);
 
 router.post('/upgrade', uploadFields, async (req, res) => {
     console.log("📩 Body reçu :", req.body);
