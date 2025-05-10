@@ -630,7 +630,60 @@ router.patch('/update-profile', async(req, res) => {
     }
 });
 
+router.post('/formulaire1', async(req, res) => {
+    try {
+        console.log("📩 Mise à jour du formulaire1 - Données reçues :", req.body);
 
+        let { email, firstname, lastname, sex, role } = req.body;
+
+        // Vérifier si l'email est fourni
+        if (!email) {
+            return res.status(400).json({ message: "L'email est obligatoire pour identifier l'utilisateur." });
+        }
+
+        // Trouver l'utilisateur dans la base de données
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: "Utilisateur non trouvé." });
+        }
+
+        // ...existing code...
+        // Nettoyage des données et valeurs par défaut
+        firstname = firstname ? firstname.trim() : user.firstname;
+        lastname = lastname ? lastname.trim() : user.lastname;
+        sex = sex ? sex.trim().toLowerCase() : user.sex;
+        role = role || user.role;
+        // ...existing code...
+
+        // Vérification du sexe (optionnel)
+        const allowedSexValues = ["أنثى", "ذكر"];
+        if (sex && !allowedSexValues.includes(sex)) {
+            return res.status(400).json({ message: "Le sexe doit être 'feminin' ou 'masculin'." });
+        }
+
+        // Mise à jour des données
+        user.firstname = firstname;
+        user.lastname = lastname;
+        user.sex = sex;
+        user.role = role;
+
+        await user.save();
+        if (role === "user") {
+            const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET, { expiresIn: "7d" });
+            return res.status(201).json({
+                message: "Utilisateur créé et connecté avec succès !",
+                token,
+                user: { firstname, lastname, email, role }
+            });
+        }
+        res.json({ message: "Informations mises à jour avec succès !" });
+
+    } catch (error) {
+        console.error("❌ Erreur lors de la mise à jour du formulaire1 :", error);
+        res.status(500).json({ message: "Erreur serveur." });
+    }
+});
 // 🔹 Supprimer compte après saisie du mot de passe 2 fois
 router.delete('/delete-account', async(req, res) => {
     try {
