@@ -347,7 +347,6 @@ router.post('/login', async(req, res) => {
 });
 
 
-// 🔹 Route pour supprimer un utilisateur avec confirmation du mot de passe
 
 router.post('/upgrade', uploadFields, async (req, res) => {
     console.log("📩 Body reçu :", req.body);
