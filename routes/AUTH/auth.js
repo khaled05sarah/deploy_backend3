@@ -119,7 +119,8 @@ router.post('/register', async(req, res) => {
             console.error("❌ Erreur d'envoi d'email :", mailError);
         }
 
-        res.status(201).json({ message: "Utilisateur créé ! Code de vérification envoyé par e-mail." });
+        res.status(201).json({message: "تم إنشاء المستخدم! تم إرسال رمز التحقق عبر البريد الإلكتروني."
+        });
 
     } catch (error) {
         console.error("❌ Erreur lors de l'inscription :", error);
@@ -141,11 +142,12 @@ router.post('/verify', async(req, res) => {
 
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: "Utilisateur non trouvé." });
+            return res.status(404).json({message: "المستخدم غير موجود." });
         }
 
         if (user.verificationCode !== code) {
-            return res.status(400).json({ message: "Code de vérification incorrect." });
+            return res.status(400).json({ message: "رمز التحقق غير صحيح."
+            });
         }
 
         user.verified = true;
@@ -154,7 +156,8 @@ router.post('/verify', async(req, res) => {
 
         console.log(`✅ Compte vérifié pour ${email}`);
 
-        res.json({ message: "Compte vérifié avec succès !" });
+        res.json({ message: "تم التحقق من الحساب بنجاح!"
+        });
 
     } catch (error) {
         console.error("❌ Erreur lors de la vérification :", error);
@@ -173,7 +176,8 @@ router.post('/forgot-password', async(req, res) => {
 
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: "Utilisateur non trouvé." });
+            return res.status(404).json({message: "المستخدم غير موجود."
+            });
         }
 
         const resetCode = generateVerificationCode();
@@ -189,7 +193,8 @@ router.post('/forgot-password', async(req, res) => {
 
         transporter.sendMail(mailOptions);
 
-        res.json({ message: "Code de réinitialisation envoyé à votre e-mail." });
+        res.json({message: "تم إرسال رمز إعادة التعيين إلى بريدك الإلكتروني."
+        });
 
     } catch (error) {
         console.error("❌ Erreur lors de l'envoi du code de réinitialisation :", error);
@@ -209,10 +214,12 @@ router.post('/verify-reset-code', async(req, res) => {
 
         const user = await User.findOne({ email, resetCode });
         if (!user) {
-            return res.status(400).json({ message: "Code incorrect ou utilisateur introuvable." });
+            return res.status(400).json({message: "رمز غير صحيح أو المستخدم غير موجود."
+            });
         }
 
-        res.json({ message: "Code valide, vous pouvez maintenant réinitialiser votre mot de passe." });
+        res.json({ message: "الرمز صالح، يمكنك الآن إعادة تعيين كلمة المرور الخاصة بك."
+        });
 
     } catch (error) {
         console.error("❌ Erreur lors de la vérification du code :", error);
@@ -233,14 +240,16 @@ router.post('/reset-password', async(req, res) => {
 
         const user = await User.findOne({ email });
         if (!user || !user.resetCode) {
-            return res.status(400).json({ message: "Réinitialisation non autorisée." });
+            return res.status(400).json({ message: "إعادة التعيين غير مصرح بها."
+            });
         }
 
         user.password = await bcrypt.hash(newPassword, 10);
         user.resetCode = null; // Réinitialiser le code de récupération
         await user.save();
 
-        res.json({ message: "Mot de passe réinitialisé avec succès." });
+        res.json({message: "تم إعادة تعيين كلمة المرور بنجاح."
+        });
 
     } catch (error) {
         console.error("❌ Erreur lors de la réinitialisation du mot de passe :", error);
@@ -269,7 +278,8 @@ router.post('/login', async(req, res) => {
             // Recherche dans User
             user = await User.findOne({ email });
             if (!user) {
-                return res.status(404).json({ message: "Utilisateur non trouvé." });
+                return res.status(404).json({ message: "لا يوجد حساب بهذا البريد الإلكتروني. الرجاء التسجيل أولاً."
+                });
             }
 
             role = user.role;
@@ -277,8 +287,8 @@ router.post('/login', async(req, res) => {
             // Refuser la connexion si le compte utilisateur n'est pas vérifié
             if (!user.verified) {
                 return res.status(400).json({ 
-                    message: "الحساب غير مفعل", 
-                    field: "unverified" 
+                    message: "الحساب غير مفعل"
+                    
                   });
             }
 
@@ -328,7 +338,8 @@ router.post('/login', async(req, res) => {
         // Vérification du mot de passe
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(403).json({ message: "Mot de passe incorrect." });
+            return res.status(403).json({ message: "كلمة المرور غير صحيحة."
+            });
         }
 
         // Génération du token JWT
@@ -367,7 +378,8 @@ router.post('/upgrade', uploadFields, async (req, res) => {
 
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: "Utilisateur non trouvé." });
+            return res.status(404).json({ message: "المستخدم غير موجود."
+            });
         }
 
         // Afficher le rôle exact reçu
@@ -614,7 +626,8 @@ router.post('/formulaire1', async(req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(404).json({ message: "Utilisateur non trouvé." });
+            return res.status(404).json({ message: "المستخدم غير موجود."
+            });
         }
 
         // ...existing code...
@@ -668,12 +681,14 @@ router.delete('/delete-account', async(req, res) => {
 
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: "Utilisateur non trouvé." });
+            return res.status(404).json({ message: "المستخدم غير موجود."
+            });
         }
 
         const isMatch = await bcrypt.compare(password1, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: "Mot de passe incorrect." });
+            return res.status(400).json({message: "كلمة المرور غير صحيحة."
+            });
         }
 
         // Supprimer l'utilisateur et ses rôles associés
@@ -712,12 +727,13 @@ router.patch('/change-password', async(req, res) => {
 
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: "Utilisateur non trouvé." });
+            return res.status(404).json({ message: "المستخدم غير موجود." });
         }
 
         const isMatch = await bcrypt.compare(ancienPassword, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: "Ancien mot de passe incorrect." });
+            return res.status(400).json({ message: "كلمة المرور القديمة غير صحيحة."
+            });
         }
 
         const salt = await bcrypt.genSalt(10);
